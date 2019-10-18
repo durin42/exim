@@ -14,8 +14,10 @@ doto: ../src/Local/Makefile
 	# we need as a side effect.
 	cd ../src/build-Linux* && FULLECHO= make -e exim || true
 
-parse_extract_address_fuzzer: parse_extract_address.cc doto
-	rm ../src/build-Linux*/macro_*.o ../src/build-Linux*/macro-*.o
+prune-macro-files:
+	rm -f ../src/build-Linux*/macro_*.o ../src/build-Linux*/macro-*.o
+
+parse_extract_address_fuzzer: parse_extract_address.cc doto prune-macro-files
 	find ../src/build-Linux* -name '*.o'
 	$(CXX) $(CXXFLAGS) -I. -I$$(ls -d ../src/build-Linux*/) \
 	    parse_extract_address.cc \
@@ -25,9 +27,29 @@ parse_extract_address_fuzzer: parse_extract_address.cc doto
 	    -lresolv -lpcre -lcrypt -lm -ldb \
 	    -lFuzzingEngine
 
-all: parse_extract_address_fuzzer
+parse_date_time_fuzzer: parse_date_time.cc doto prune-macro-files
+	find ../src/build-Linux* -name '*.o'
+	$(CXX) $(CXXFLAGS) -I. -I$$(ls -d ../src/build-Linux*/) \
+	    parse_date_time.cc \
+	    ../src/build-Linux*/*.o ../src/build-Linux*/lookups/*.o \
+	    ../src/build-Linux*/*/*.o \
+	    -o $$OUT/parse_date_time_fuzzer \
+	    -lresolv -lpcre -lcrypt -lm -ldb \
+	    -lFuzzingEngine
+
+parse_fix_phrase_fuzzer: parse_fix_phrase.cc doto prune-macro-files
+	find ../src/build-Linux* -name '*.o'
+	$(CXX) $(CXXFLAGS) -I. -I$$(ls -d ../src/build-Linux*/) \
+	    parse_fix_phrase.cc \
+	    ../src/build-Linux*/*.o ../src/build-Linux*/lookups/*.o \
+	    ../src/build-Linux*/*/*.o \
+	    -o $$OUT/parse_fix_phrase_fuzzer \
+	    -lresolv -lpcre -lcrypt -lm -ldb \
+	    -lFuzzingEngine
+
+all: parse_extract_address_fuzzer parse_date_time_fuzzer parse_fix_phrase_fuzzer
 
 clean:
 	$(RM) *.o *_fuzzer
 
-.PHONY: all clean doto
+.PHONY: all clean doto prune-macro-files
