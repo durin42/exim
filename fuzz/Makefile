@@ -47,7 +47,17 @@ parse_fix_phrase_fuzzer: parse_fix_phrase.cc doto prune-macro-files
 	    -lresolv -lpcre -lcrypt -lm -ldb \
 	    -lFuzzingEngine
 
-all: parse_extract_address_fuzzer parse_date_time_fuzzer parse_fix_phrase_fuzzer
+parse_forward_list_fuzzer: parse_forward_list.cc doto prune-macro-files
+	find ../src/build-Linux* -name '*.o'
+	$(CXX) $(CXXFLAGS) -I. -I$$(ls -d ../src/build-Linux*/) \
+	    parse_forward_list.cc \
+	    ../src/build-Linux*/*.o ../src/build-Linux*/lookups/*.o \
+	    ../src/build-Linux*/*/*.o \
+	    -o $$OUT/parse_forward_list_fuzzer \
+	    -lresolv -lpcre -lcrypt -lm -ldb \
+	    -lFuzzingEngine
+
+all: parse_extract_address_fuzzer parse_date_time_fuzzer parse_fix_phrase_fuzzer parse_forward_list_fuzzer
 
 clean:
 	$(RM) *.o *_fuzzer
