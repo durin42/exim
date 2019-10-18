@@ -103,7 +103,7 @@ extern int     auth_call_pam(const uschar *, uschar **);
 extern int     auth_call_pwcheck(uschar *, uschar **);
 extern int     auth_call_radius(const uschar *, uschar **);
 extern int     auth_call_saslauthd(const uschar *, const uschar *,
-	         const uschar *, const uschar *, uschar **);
+                 const uschar *, const uschar *, uschar **);
 extern int     auth_check_serv_cond(auth_instance *);
 extern int     auth_check_some_cond(auth_instance *, uschar *, uschar *, int);
 extern int     auth_client_item(void *, auth_instance *, const uschar **,
@@ -171,7 +171,7 @@ extern void    debug_print_string(uschar *);
 extern void    debug_print_tree(tree_node *);
 extern void    debug_vprintf(int, const char *, va_list);
 extern void    decode_bits(unsigned int *, size_t, int *,
-	           uschar *, bit_table *, int, uschar *, int);
+                   uschar *, bit_table *, int, uschar *, int);
 extern address_item *deliver_make_addr(uschar *, BOOL);
 extern void    deliver_init(void);
 extern void    delivery_log(int, address_item *, int, uschar *);
@@ -590,7 +590,7 @@ extern int     verify_check_host(uschar **);
 extern int     verify_check_notblind(BOOL);
 extern int     verify_check_given_host(const uschar **, const host_item *);
 extern int     verify_check_this_host(const uschar **, unsigned int *,
-	         const uschar*, const uschar *, const uschar **);
+                 const uschar*, const uschar *, const uschar **);
 extern address_item *verify_checked_sender(uschar *);
 extern void    verify_get_ident(int);
 extern BOOL    verify_sender(int *, uschar **);
@@ -650,7 +650,7 @@ static inline uschar *
 string_copy_taint_trc(const uschar *s, BOOL tainted, const char * func, int line)
 {
 int len = Ustrlen(s) + 1;
-uschar *ss = store_get_3(len, tainted, func, line);
+ uschar *ss = (uschar*)store_get_3(len, tainted, func, line);
 memcpy(ss, s, len);
 return ss;
 }
@@ -677,7 +677,7 @@ Returns:  copy of string in new store, with letters lowercased
 static inline uschar *
 string_copylc(const uschar *s)
 {
-uschar *ss = store_get(Ustrlen(s) + 1, is_tainted(s));
+  uschar *ss = (uschar*)store_get(Ustrlen(s) + 1, is_tainted(s));
 uschar *p = ss;
 while (*s != 0) *p++ = tolower(*s++);
 *p = 0;
@@ -705,7 +705,7 @@ This is an API for local_scan hence not static.
 static inline uschar *
 string_copyn(const uschar *s, int n)
 {
-uschar *ss = store_get(n + 1, is_tainted(s));
+uschar *ss = (uschar*)store_get(n + 1, is_tainted(s));
 Ustrncpy(ss, s, n);
 ss[n] = 0;
 return ss;
@@ -728,7 +728,7 @@ Returns:    copy of string in new store, with letters lowercased
 static inline uschar *
 string_copynlc(uschar *s, int n)
 {
-uschar *ss = store_get(n + 1, is_tainted(s));
+uschar *ss = (uschar*)store_get(n + 1, is_tainted(s));
 uschar *p = ss;
 while (n-- > 0) *p++ = tolower(*s++);
 *p = 0;
@@ -755,7 +755,7 @@ int len = Ustrlen(s) + 1;
 uschar *ss;
 
 store_pool = POOL_PERM;
-ss = store_get(len, force_taint || is_tainted(s));
+ ss = (uschar*)store_get(len, force_taint || is_tainted(s));
 memcpy(ss, s, len);
 store_pool = old_pool;
 return ss;
@@ -789,7 +789,7 @@ va_end(ap);
 static inline gstring *
 string_get_tainted_trc(unsigned size, BOOL tainted, const char * func, unsigned line)
 {
-gstring * g = store_get_3(sizeof(gstring) + size, tainted, func, line);
+  gstring * g = (gstring*)store_get_3(sizeof(gstring) + size, tainted, func, line);
 g->size = size;
 g->ptr = 0;
 g->s = US(g + 1);
@@ -855,7 +855,7 @@ return g;
 static inline dns_answer *
 store_get_dns_answer_trc(const uschar * func, unsigned line)
 {
-return store_get_3(sizeof(dns_answer), TRUE, CCS func, line);  /* use tainted mem */
+  return (dns_answer*)store_get_3(sizeof(dns_answer), TRUE, CCS func, line);  /* use tainted mem */
 }
 
 /******************************************************************************/
@@ -887,7 +887,7 @@ return string_sprintf("%s%s%s%s%s",
 
 static inline uschar *
 spool_fname(const uschar * purpose, const uschar * subdir, const uschar * fname,
-       	const uschar * suffix)
+        const uschar * suffix)
 {
 return string_sprintf("%s/%s/%s/%s/%s%s",
 	spool_directory, queue_name, purpose, subdir, fname, suffix);
