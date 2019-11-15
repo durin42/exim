@@ -1504,6 +1504,8 @@ Returns:    EXIT_SUCCESS if terminated successfully
               to the sender, and -oee was given
 */
 
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+
 int
 main(int argc, char **cargv)
 {
@@ -5690,5 +5692,6 @@ exim_exit(EXIT_SUCCESS, US"main");   /* Never returns */
 return 0;                  /* To stop compiler warning */
 }
 
+#endif // FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 
 /* End of exim.c */
